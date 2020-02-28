@@ -1,6 +1,8 @@
 
 const express = require('express');
 const bodyParser = require("body-parser");
+const date = require(__dirname+"/date.js"); //module that is located in the current directory 
+
 
 const app = express();
 
@@ -10,38 +12,54 @@ app.use(express.static("public")); //this is to apply the public files that are 
 
 
 let newitems = ["Buy Food","Cook Food"];
+let workitems = ["work items"];
 
 //This is to make sure the connections was succesfull
 
 app.get("/", function(req,res){
 
-    
-    let date = new Date();
+    let day = date.getDay();
 
-    let options = {
-        weekday: "long",
-        day:"numeric",
-        month:"long"
-    };
-
-    let currentday = date.getDay();
-    let day = date.toLocaleDateString("en-US",options); //custom date eg. Thursday, February 27
-
-    res.render("list", {kindofday: day, newListItems: newitems}); //update the list.ejs
+    res.render("list", {listtitle: day, newListItems: newitems}); //update the list.ejs
 
 });
 
 
 
-
+//this is one route "/"
 app.post("/",function(req,res){
 
     let item = req.body.newItem;
+
+    if(req.body.button === "Work"){
+        workitems.push(item);
+        res.redirect("/work");
+    }else{
+        
     newitems.push(item);  //get the tag from the form
     res.redirect("/");  //redirect to the test
     
+    }
+    
 });
 
+
+//this is another route get
+app.get("/work", function(req,res){
+    res.render("list",{listtitle:"Work",newListItems:workitems})
+});
+
+
+//this is another route post but we do not need this part since the button POSTS to the "/" route
+// app.post("/work", function(req,res){
+//     let item = req.body.newItem;
+//     res.redirect("/work");
+// });
+
+
+app.get("/about", function(req, res){
+    res.render("about");
+});
 
 
 //This is to make sure that application is running in the port 3000
